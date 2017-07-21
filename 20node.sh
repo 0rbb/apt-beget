@@ -6,7 +6,7 @@
 function install_nodejs {
     #depencies
     echo_y "Satisfaying depencies..."
-    install_nodejs6
+    install_nodejs_lts
 }
 
 :<<=
@@ -67,7 +67,7 @@ function install_nodejs012 {
 ===https://nodejs.org/
 ===https://github.com/nodejs/node/
 =
-function install_nodejs6 {
+function install_nodejs_lts {
     check_d
     echo_y "Installing nodejs6..."
 

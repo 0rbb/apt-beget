@@ -4,9 +4,14 @@
 =
 function install_drush {
     echo_y "Installing drush..."
-    if [ -z $1 ]
-        then echo "Define the version"
-        exit 1
+
+    #collecting install information
+    echo_y "Choose the version..."
+    composer show -a "drush/drush" | grep versions
+    read drush_version
+    if [[ ! $drush_version ]]
+    then
+        drush_version='dev-master'
     fi
 
     #prepare folders
@@ -20,7 +25,7 @@ function install_drush {
     #install
     echo_y "Installing..."
     echo_y "Version set to $1"
-    composer global require "drush/drush:$1.x-dev"
+    composer global require "drush/drush:$drush_version"
 
     #finish
     echo_g "drush installed"

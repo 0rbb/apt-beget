@@ -6,6 +6,21 @@ function install_default {
     check_ds
     echo_y "Installing default..."
 
+    #collecting install information
+    echo_y "ENTER (default is VERSION)"
+    read var
+    if [[ $var ]]
+    then
+        var='VERSION'
+    else
+        var='VERSION'
+    fi
+    
+    if [[ ! $var ]]
+    then
+        var='VERSION'
+    fi
+
     #prepare folders
     echo_y "Preparing folders..."
     prepare_folders

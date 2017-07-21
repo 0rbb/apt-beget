@@ -104,6 +104,9 @@ case $1 in
     'ror')
         install_ror
         ;;
+    'wordpress')
+        install_wordpress
+        ;;
     'wpcli')
         install_wpcli
         ;;

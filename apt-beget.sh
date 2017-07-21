@@ -288,6 +288,36 @@ PassengerPython  $HOME/.local/bin/python3" > $HOME/$target_directory/.htaccess
 
 
 :<<=
+==DRUPAL CONSOLE
+===https://drupalconsole.com/
+=
+function install_drupalconsole {
+    check_ds
+    echo_y "Installing default..."
+
+    #download
+    echo_y "Downloading..."
+    cd $HOME/.local/opt/
+    curl -Lk https://drupalconsole.com/installer -o drupal.phar
+    if [ ! -f "$HOME/.local/opt/drupal.phar" ]
+    then
+        echo_r "Seems like downloading is failed"
+        exit 1
+    fi
+
+    #install
+    echo_y "Installing..."
+    echo "/usr/local/php-cgi/5.6/bin/php -dshort_open_tag=On -ddate.timezone='Europe/Moscow' $HOME/.local/opt/drupal.phar \$@" > $HOME/.local/bin/drupal
+    chmod +x $HOME/.local/bin/drupal
+    drupal self-update
+    drupal
+
+    #finish
+    echo_g "default installed"
+}
+
+
+:<<=
 ==Drupal 7
 ===https://www.drupal.org/
 =
@@ -351,44 +381,19 @@ function install_drupal_8 {
 
 
 :<<=
-==DRUPAL CONSOLE
-===https://drupalconsole.com/
-=
-function install_drupalconsole {
-    check_ds
-    echo_y "Installing default..."
-
-    #download
-    echo_y "Downloading..."
-    cd $HOME/.local/opt/
-    curl -Lk https://drupalconsole.com/installer -o drupal.phar
-    if [ ! -f "$HOME/.local/opt/drupal.phar" ]
-    then
-        echo_r "Seems like downloading is failed"
-        exit 1
-    fi
-
-    #install
-    echo_y "Installing..."
-    echo "/usr/local/php-cgi/5.6/bin/php -dshort_open_tag=On -ddate.timezone='Europe/Moscow' $HOME/.local/opt/drupal.phar \$@" > $HOME/.local/bin/drupal
-    chmod +x $HOME/.local/bin/drupal
-    drupal self-update
-    drupal
-
-    #finish
-    echo_g "default installed"
-}
-
-
-:<<=
 ==drush
 ===http://www.drush.org/
 =
 function install_drush {
     echo_y "Installing drush..."
-    if [ -z $1 ]
-        then echo "Define the version"
-        exit 1
+
+    #collecting install information
+    echo_y "Choose the version..."
+    composer show -a "drush/drush" | grep versions
+    read drush_version
+    if [[ ! $drush_version ]]
+    then
+        drush_version='dev-master'
     fi
 
     #prepare folders
@@ -402,7 +407,7 @@ function install_drush {
     #install
     echo_y "Installing..."
     echo_y "Version set to $1"
-    composer global require "drush/drush:$1.x-dev"
+    composer global require "drush/drush:$drush_version"
 
     #finish
     echo_g "drush installed"
@@ -441,6 +446,35 @@ function install_ewww {
 
     #finish
     echo_g "EWWW utils and patch installed"
+}
+
+
+function install_ghostscript {
+    echo_y "Installing Ghostscript..."
+
+    prepare_folders
+    cd $HOME/.beget/tmp
+
+    echo_y "Downloading tarball"
+    curl -Lk https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs919/ghostscript-9.19-linux-x86_64.tgz > $HOME/.beget/tmp/ghostscript-9.19-linux-x86_64.tgz
+    if [ ! -f "$HOME/.beget/tmp/ghostscript-9.19-linux-x86_64.tgz" ]
+    then
+        echo_r "Seems like downloading is failed"
+        exit 1
+    fi
+
+    echo_y "Unpacking tarball"
+    tar xvf ghostscript-9.19-linux-x86_64.tgz
+    if [ ! -d "$HOME/.beget/tmp/ghostscript-9.19-linux-x86_64" ]
+    then
+        echo_r "Seems like unpacking is failed"
+        exit 1
+    fi
+
+    mv $HOME/.beget/tmp/ghostscript-9.19-linux-x86_64 $HOME/.local/opt/
+    ln -sf $HOME/.local/opt/ghostscript-9.19-linux-x86_64/gs-919-linux_x86_64 $HOME/.local/bin/ghostscript
+    ln -sf $HOME/.local/opt/ghostscript-9.19-linux-x86_64/gs-919-linux_x86_64 $HOME/.local/bin/gs
+    echo_g "Ghostscript installed"
 }
 
 
@@ -496,35 +530,6 @@ PassengerStartupFile app.js" > $HOME/.htaccess
 
     #finish
     echo_g "Ghost installed"
-}
-
-
-function install_ghostscript {
-    echo_y "Installing Ghostscript..."
-
-    prepare_folders
-    cd $HOME/.beget/tmp
-
-    echo_y "Downloading tarball"
-    curl -Lk https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs919/ghostscript-9.19-linux-x86_64.tgz > $HOME/.beget/tmp/ghostscript-9.19-linux-x86_64.tgz
-    if [ ! -f "$HOME/.beget/tmp/ghostscript-9.19-linux-x86_64.tgz" ]
-    then
-        echo_r "Seems like downloading is failed"
-        exit 1
-    fi
-
-    echo_y "Unpacking tarball"
-    tar xvf ghostscript-9.19-linux-x86_64.tgz
-    if [ ! -d "$HOME/.beget/tmp/ghostscript-9.19-linux-x86_64" ]
-    then
-        echo_r "Seems like unpacking is failed"
-        exit 1
-    fi
-
-    mv $HOME/.beget/tmp/ghostscript-9.19-linux-x86_64 $HOME/.local/opt/
-    ln -sf $HOME/.local/opt/ghostscript-9.19-linux-x86_64/gs-919-linux_x86_64 $HOME/.local/bin/ghostscript
-    ln -sf $HOME/.local/opt/ghostscript-9.19-linux-x86_64/gs-919-linux_x86_64 $HOME/.local/bin/gs
-    echo_g "Ghostscript installed"
 }
 
 
@@ -1091,7 +1096,7 @@ function install_newscoop {
 function install_nodejs {
     #depencies
     echo_y "Satisfaying depencies..."
-    install_nodejs6
+    install_nodejs_lts
 }
 
 :<<=
@@ -1152,7 +1157,7 @@ function install_nodejs012 {
 ===https://nodejs.org/
 ===https://github.com/nodejs/node/
 =
-function install_nodejs6 {
+function install_nodejs_lts {
     check_d
     echo_y "Installing nodejs6..."
 
@@ -2052,7 +2057,7 @@ function install_wordpress {
 
 
     #finish
-    echo_g "default installed"
+    echo_g "WordPress installed"
 }
 
 

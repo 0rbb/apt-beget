@@ -63,12 +63,11 @@ function install_nodejs012 {
 }
 
 :<<=
-==nodejs6
+==nodejs (latest lts)
 ===https://nodejs.org/
 ===https://github.com/nodejs/node/
 =
 function install_nodejs_lts {
-    check_d
     echo_y "Installing nodejs6..."
 
     #prepare folders

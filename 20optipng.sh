@@ -24,7 +24,6 @@ function install_optipng {
     cd $HOME/.beget/tmp/optipng-0.7.6/
     ./configure --prefix=$HOME/.local
     make -j $(expr $(nproc) / 4)
-    make test
     make install
 
     echo_g "optipng installed"

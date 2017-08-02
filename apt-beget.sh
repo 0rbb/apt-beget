@@ -1407,7 +1407,6 @@ function install_optipng {
     cd $HOME/.beget/tmp/optipng-0.7.6/
     ./configure --prefix=$HOME/.local
     make -j $(expr $(nproc) / 4)
-    make test
     make install
 
     echo_g "optipng installed"
@@ -1837,7 +1836,6 @@ function install_solr {
     phpize
     ./configure --prefix=$HOME/.local/lib/php/56/
     make
-    make test #ignore fail
     make install #ignore fail
     
     cp $HOME/.beget/tmp/solr-2.4.0/modules/solr.so $HOME/.local/lib/php/56/

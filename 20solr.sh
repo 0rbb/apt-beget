@@ -39,7 +39,6 @@ function install_solr {
     phpize
     ./configure --prefix=$HOME/.local/lib/php/56/
     make
-    make test #ignore fail
     make install #ignore fail
     
     cp $HOME/.beget/tmp/solr-2.4.0/modules/solr.so $HOME/.local/lib/php/56/

@@ -1,4 +1,4 @@
-git status:<<=
+<<=
 ==libxml2
 =
 function install_libxml2 {

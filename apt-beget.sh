@@ -2059,6 +2059,9 @@ case $1 in
     -h|--help)
         installer_help
         ;;
+    'apt')
+        apt_localinstall $2
+        ;;
     'composer')
         install_composer
         ;;

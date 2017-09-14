@@ -8,8 +8,8 @@ function install_python3 {
 
     #Download
     echo_y 'Downloading...'
-    curl -Lk https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz > $HOME/.beget/tmp/Python-3.6.1.tgz
-    if [ ! -f "$HOME/.beget/tmp/Python-3.6.1.tgz" ]
+    curl -Lk https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz > $HOME/.beget/tmp/Python-3.6.2.tgz
+    if [ ! -f "$HOME/.beget/tmp/Python-3.6.2.tgz" ]
     then
         echo_r 'download is failed'
         exit 1
@@ -18,8 +18,8 @@ function install_python3 {
     #Unpacking
     cd $HOME/.beget/tmp
     echo_y 'Unpacking...'
-    tar xvf Python-3.6.1.tgz
-    if [ ! -d "$HOME/.beget/tmp/Python-3.6.1" ]
+    tar xvf Python-3.6.2.tgz
+    if [ ! -d "$HOME/.beget/tmp/Python-3.6.2" ]
     then
         echo_r "Seems like unpacking is failed"
         exit 1
@@ -27,7 +27,7 @@ function install_python3 {
 
     #Compiling
     echo_y "Compiling..."
-    cd Python-3.6.1
+    cd Python-3.6.2
     ./configure --prefix $HOME/.local
     make -j $(expr $(nproc) / 4)
     make install

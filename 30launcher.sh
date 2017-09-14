@@ -53,6 +53,9 @@ case $1 in
     'joomlatools')
         install_joomlatools
         ;;
+    'laravel')
+        install_laravel
+        ;;
     'magento_ce')
         install_magento_ce
         ;;

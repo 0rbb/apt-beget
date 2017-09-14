@@ -1,5 +1,5 @@
-<<=
-==libxml2
+:<<=
+==LXML 2
 =
 function install_libxml2 {
     check_ds

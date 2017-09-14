@@ -7,7 +7,7 @@ function install_default {
     echo_y "Installing default..."
 
     #collecting install information
-    echo_y "ENTER (default is VERSION)"
+    echo_y "ENTER parametr (default is VERSION)"
     read var
     if [[ $var ]]
     then

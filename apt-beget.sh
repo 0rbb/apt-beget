@@ -332,59 +332,51 @@ function install_cwebp {
 }
 
 
+:<<=
+==Django
+=
 function install_django {
-    echo_y "Installing Python 3 and Django..."
-    check_d
-    
-    target_directory=${BASH_ARGV[0]}
-    echo $target_directory
-    
-    if [ -z "$target_directory" ]
-    then
-        echo_r "А куда стовить-то? Set second parameter as target directory."
-        exit 1
-    fi
-    
+    check_ds
+    echo_y "Installing Django..."
+
+    #prepare folders
+    echo_y "Preparing folders..."
+    prepare_folders
+
     #depencies
     echo_y "Satisfaying depencies..."
     install_python3
 
-    #Application
-    echo_y 'Creating application...'
-    cd $HOME
-
-    mkdir -p $HOME/$target_directory/public
-    rm -rf $HOME/$target_directory/public_html
-    ln -sf $HOME/$target_directory/public $HOME/$target_directory/public_html
-
-    mkdir $HOME/.cache
-
+#install
+    echo_y "Installing..."
     pip3 install django --user --ignore-installed
-
-    cd $target_directory
-    python3 $HOME/.local/bin/django-admin.py startproject HelloDjango
-
+    echo_y "Creating project..."
+    python3 $HOME/.local/bin/django-admin.py startproject .
+    echo_y "Setting up..."
     echo "# -*- coding: utf-8 -*-
 import os, sys
 #project directory
-sys.path.insert(0, '$HOME/$target_directory/HelloDjango')
+sys.path.insert(0, '$HOME/HelloDjango')
 sys.path.insert(1, '$HOME/.local/lib/python3.6/site-packages')
 #project settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'HelloDjango.settings')
 #start server
 from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()" > $HOME/$target_directory/HelloDjango/passenger_wsgi.py
-
-    sed -i "s/ALLOWED_HOSTS\s=\s\[\]/ALLOWED_HOSTS = \['$target_directory'\]/g" $HOME/$target_directory/HelloDjango/HelloDjango/settings.py
+application = get_wsgi_application()" > $HOME/HelloDjango/passenger_wsgi.py
 
     echo "PassengerEnabled On
-PassengerAppRoot $HOME/$target_directory/HelloDjango
-PassengerPython  $HOME/.local/bin/python3" > $HOME/$target_directory/.htaccess
+PassengerAppRoot $HOME/HelloDjango
+PassengerPython  $HOME/.local/bin/python3" > $HOME/.htaccess
 
-    mkdir -p $HOME/$target_directory/tmp
-    touch    $HOME/$target_directory/tmp/restart.txt
+    target_directory="$(basename $( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ))"
+    sed -i "s/ALLOWED_HOSTS\s=\s\[\]/ALLOWED_HOSTS = \['$target_directory'\]/g" $HOME/HelloDjango/HelloDjango/settings.py
+    echo_y "Edit 'ALLOWED_HOSTS' in $HOME/HelloDjango/HelloDjango/settings.py if domain name is different from"
 
-    echo_g 'check it now'
+    mkdir -p $HOME/tmp
+    touch    $HOME/tmp/restart.txt
+
+    #finish
+    echo_g "Django installed"
 }
 
 
@@ -962,6 +954,44 @@ function install_jpegtran {
 }
 
 
+:<<=
+==Laravel
+=
+function install_laravel {
+    check_ds
+    echo_y "Installing Laravel..."
+
+    #prepare folders
+    echo_y "Preparing folders..."
+    prepare_folders
+
+    #depencies
+    echo_y "Satisfaying depencies..."
+    install_composer
+#    install_nodejs
+
+    #install
+    echo_y "Installing..."
+    cd ~
+    rm -rf ~/public_html
+
+    echo "/usr/local/php-cgi/7.1/bin/php -c $HOME/.local/etc/php.ini \$@" > $HOME/.local/bin/php
+    chmod +x $HOME/.local/bin/php
+
+#    composer create-project --prefer-dist laravel/laravel public_html
+    composer global require "laravel/installer"
+    PATH=$PATH:~/.composer/vendor/bin/
+    laravel new . --force
+    ln -s public public_html
+    cp .env.example .env
+    ./artisan key:generate
+    ./artisan config:clear
+
+    #finish
+    echo_g "Laravel installed"
+}
+
+
 function install_libsmbclient {
     check_ds
     prepare_folders
@@ -987,8 +1017,8 @@ function install_libsmbclient {
 }
 
 
-<<=
-==libxml2
+:<<=
+==LXML 2
 =
 function install_libxml2 {
     check_ds
@@ -1761,8 +1791,8 @@ function install_python3 {
 
     #Download
     echo_y 'Downloading...'
-    curl -Lk https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz > $HOME/.beget/tmp/Python-3.6.1.tgz
-    if [ ! -f "$HOME/.beget/tmp/Python-3.6.1.tgz" ]
+    curl -Lk https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz > $HOME/.beget/tmp/Python-3.6.2.tgz
+    if [ ! -f "$HOME/.beget/tmp/Python-3.6.2.tgz" ]
     then
         echo_r 'download is failed'
         exit 1
@@ -1771,8 +1801,8 @@ function install_python3 {
     #Unpacking
     cd $HOME/.beget/tmp
     echo_y 'Unpacking...'
-    tar xvf Python-3.6.1.tgz
-    if [ ! -d "$HOME/.beget/tmp/Python-3.6.1" ]
+    tar xvf Python-3.6.2.tgz
+    if [ ! -d "$HOME/.beget/tmp/Python-3.6.2" ]
     then
         echo_r "Seems like unpacking is failed"
         exit 1
@@ -1780,7 +1810,7 @@ function install_python3 {
 
     #Compiling
     echo_y "Compiling..."
-    cd Python-3.6.1
+    cd Python-3.6.2
     ./configure --prefix $HOME/.local
     make -j $(expr $(nproc) / 4)
     make install
@@ -1797,15 +1827,24 @@ function install_python3 {
 }
 
 
-function install_ror {
-    #curl -sSL https://rvm.io/mpapis.asc | gpg --import -
-    #curl -sSL https://get.rvm.io | bash -s stable --ruby --gems=rails,rb-readline,execjs,therubyracer
+:<<=
+==Ruby On Rails
+=
+function install_default {
     check_ds
-    chruby ruby-2.2.2
-    echo 2.2.2 > $HOME/.ruby-version
+    echo_y "Installing Ruby On Rails..."
+
+    #prepare folders
+    echo_y "Preparing folders..."
+    prepare_folders
+
+    #install
+    echo_y "Installing..."
+    chruby ruby-2.3
+    echo '2.3' > $HOME/.ruby-version
     cd $HOME
-    ls -la | grep -v beget_install | awk '{print $9}'| xargs rm -rf # delete all exept myself
     gem install rails --no-rdoc --no-ri
+    gem install rb-readline --no-rdoc --no-ri
     rails new .
     ln -sf public public_html
     echo "gem 'rb-readline'
@@ -1813,16 +1852,21 @@ function install_ror {
     gem 'therubyracer'
     gem 'sqlite3'" >> $HOME/Gemfile
     bundle install
+
+    echo_y "Setting up..."
     echo "RailsEnv development
-        PassengerUploadBufferDir `pwd`/tmp
-        PassengerRuby /opt/rubies/ruby-2.2.2/bin/ruby
-        PassengerAppRoot `pwd`
-        SetEnv GEM_HOME $HOME/.gem/ruby/2.2.2/:/opt/rubies/ruby-2.2.2/lib/ruby/gems/2.2.0/" >> $HOME/.htaccess
-    echo "ENV['GEM_HOME'] = '$HOME/.gem/ruby/2.2.2/'
-ENV['GEM_PATH'] = '$HOME/.gem/ruby/2.2.2/'
+PassengerUploadBufferDir `pwd`/tmp
+PassengerRuby /opt/rubies/ruby-2.3/bin/ruby
+PassengerAppRoot `pwd`
+SetEnv GEM_HOME $HOME/.gem/ruby/2.3.1/:/opt/rubies/ruby-2.3/lib/ruby/gems/2.3.0/" >> $HOME/.htaccess
+    echo "ENV['GEM_HOME'] = '$HOME/.gem/ruby/2.3.1/'
+ENV['GEM_PATH'] = '$HOME/.gem/ruby/2.3.1/'
 require 'bundler/setup'" >> $HOME/config/setup_load_paths.rb
     mkdir $HOME/tmp
     touch $HOME/tmp/restart.txt
+
+    #finish
+    echo_g "Ruby On Rails installed"
 }
 
 
@@ -2109,6 +2153,9 @@ case $1 in
         ;;
     'joomlatools')
         install_joomlatools
+        ;;
+    'laravel')
+        install_laravel
         ;;
     'magento_ce')
         install_magento_ce

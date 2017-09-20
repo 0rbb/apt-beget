@@ -1,9 +1,15 @@
 echo '#!/usr/bin/env bash' > apt-beget.sh
 
-for package_name in `find . -regex '\.\/[1-2]0\w*\.sh' | sort`
+for helper in `find helpers -type f | sort`
 do
-	cat $package_name >> apt-beget.sh
+	cat $helper >> apt-beget.sh
     printf "\n\n" >> apt-beget.sh
 done 
 
-cat 30launcher.sh >> apt-beget.sh
+for installer in `find installers -type f | sort`
+do
+	cat $installer >> apt-beget.sh
+    printf "\n\n" >> apt-beget.sh
+done 
+
+cat launcher.sh >> apt-beget.sh

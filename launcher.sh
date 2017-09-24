@@ -86,6 +86,9 @@ case $1 in
     'pngout')
         install_pngout
         ;;
+    'phalcon')
+        install_phalcon
+        ;;
     'phantomjs')
         install_phantomjs
         ;;

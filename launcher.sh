@@ -26,6 +26,9 @@ case $1 in
     'ewww')
         install_ewww
         ;;
+    'flask')
+        install_flask
+        ;;
     'ghostscript')
         install_ghostscript
         ;;

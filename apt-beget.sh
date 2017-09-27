@@ -542,6 +542,62 @@ function install_ewww {
 }
 
 
+:<<=
+==flask
+=
+function install_flask {
+    check_ds
+    echo_y "Installing flask..."
+
+    #prepare folders
+    echo_y "Preparing folders..."
+    prepare_folders
+
+    #depencies
+    echo_y "Satisfaying depencies..."
+    install_python3
+
+    #install
+    echo_y "Installing..."
+    pip3 install flask --user --ignore-installed
+    
+    echo_y "Creating project..."
+    mkdir -p $HOME/HelloFlask    
+    echo "# -*- coding: utf-8 -*-
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello Flask!'
+
+if __name__ == '__main__':
+    app.run()" > $HOME/HelloFlask/__init__.py
+
+    echo "# -*- coding: utf-8 -*-
+import os, sys
+#project directory
+sys.path.insert(0, '$HOME/Helloflask')
+sys.path.insert(1, '$HOME/.local/lib/python3.6/site-packages')
+
+from HelloFlask import app as application # когда Flask стартует, он ищет application. Если не указать 'as application', сайт не заработает
+from werkzeug.debug import DebuggedApplication # Опционально: подключение модуля отладки
+application.wsgi_app = DebuggedApplication(application.wsgi_app, True) # Опционально: включение модуля отадки
+application.debug = False  # Опционально: True/False устанавливается по необходимости в отладке" > $HOME/passenger_wsgi.py
+
+    echo_y "Setting up..."
+    echo "PassengerEnabled On
+PassengerPython  $HOME/.local/bin/python3" > $HOME/.htaccess
+
+    ln -s public_html public    
+    
+    mkdir -p $HOME/tmp
+    touch    $HOME/tmp/restart.txt
+
+    #finish
+    echo_g "flask installed"
+}
+
 function install_ghostscript {
     echo_y "Installing Ghostscript..."
 
@@ -1573,6 +1629,70 @@ function install_pdfinfo {
 
 
 :<<=
+==phalcon
+===NOT AN INSTALLER, JUST STUB TO CREATE INSTALLER
+=
+function install_phalcon {
+    check_ds
+    echo_y "Installing phalcon..."
+
+    echo_y "Enter PHP version (default is 7.1)"
+    read var
+    if [[ ! $var ]]
+    then
+        var='7.1'
+    fi
+
+    #prepare folders
+    echo_y "Preparing folders..."
+    prepare_folders
+
+    #depencies
+    echo_y "Satisfaying depencies..."
+
+    #cloning
+    echo_y "Cloning..."
+    cd $HOME/.beget/tmp
+    git clone --depth=1 "git://github.com/phalcon/cphalcon.git"
+    if [ ! -d "$HOME/.beget/tmp/cphalcon" ]
+    then
+        echo_r "Seems like cloning is failed"
+        exit 1
+    fi
+    
+
+    #compilation
+    echo_y "Compilating..."
+    cd $HOME/.beget/tmp/cphalcon/build
+    PATH=$PATH:/usr/local/php-cgi/7.1/bin/
+    ./install
+    if [ ! -f "$HOME/.beget/tmp/cphalcon/build/php7/64bits/modules/phalcon.so" ]
+    then
+        echo_r 'seems like compilation is failed'
+        exit 1
+    fi
+
+    #install
+    echo_y "Installing..."
+    mkdir -p "$HOME/.local/php/cgi/$var/lib/php/"
+    cp "$HOME/.beget/tmp/cphalcon/build/php7/64bits/modules/phalcon.so" "$HOME/.local/php/cgi/$var/lib/php/"
+
+    if [ ! -f "$HOME/public_html/cgi-bin/php.ini" ]
+    then
+        mkdir -p $HOME/public_html/cgi-bin/
+        cp /etc/php/cgi/$var/php.ini $HOME/public_html/cgi-bin/php.ini
+    fi
+    sed -i 's/; EOF//g' $HOME/public_html/cgi-bin/php.ini
+    printf "\n\n[PHP]\nextension = $HOME/.local/php/cgi/$var/lib/php/phalcon.so" >> $HOME/public_html/cgi-bin/php.ini
+
+    echo '<?php phpinfo();' > $HOME/public_html/x.php
+
+    #finish
+    echo_g "phalcon installed"
+}
+
+
+:<<=
 ==PhantomJS
 ===PhantomJS is a headless WebKit scriptable with a JavaScript API.
 ===http://phantomjs.org/
@@ -2127,6 +2247,9 @@ case $1 in
     'ewww')
         install_ewww
         ;;
+    'flask')
+        install_flask
+        ;;
     'ghostscript')
         install_ghostscript
         ;;
@@ -2186,6 +2309,9 @@ case $1 in
         ;;
     'pngout')
         install_pngout
+        ;;
+    'phalcon')
+        install_phalcon
         ;;
     'phantomjs')
         install_phantomjs

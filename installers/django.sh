@@ -13,11 +13,14 @@ function install_django {
     echo_y "Satisfaying depencies..."
     install_python3
 
-#install
+    #install
     echo_y "Installing..."
     pip3 install django --user --ignore-installed
+
     echo_y "Creating project..."
-    python3 $HOME/.local/bin/django-admin.py startproject .
+    cd $HOME
+    $HOME/.local/bin/python3 $HOME/.local/bin/django-admin.py startproject HelloDjango --verbosity 3
+
     echo_y "Setting up..."
     echo "# -*- coding: utf-8 -*-
 import os, sys

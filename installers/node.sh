@@ -46,7 +46,7 @@ function install_nodejs012 {
     echo_y "Compilating..."
     cd $HOME/.beget/tmp/node-v0.12.7
     ./configure --dest-os=linux --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/node" ]
     then

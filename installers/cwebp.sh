@@ -20,7 +20,7 @@ function install_cwebp {
     cd $HOME/.beget/tmp/libwebp
     ./autogen.sh
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/cwebp" ]
     then

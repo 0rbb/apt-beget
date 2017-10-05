@@ -24,7 +24,7 @@ function install_jpegoptim {
     echo_y "Compilating..."
     cd jpegoptim
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make strip
     make install
     if [ ! -f "$HOME/.local/bin/jpegoptim" ]

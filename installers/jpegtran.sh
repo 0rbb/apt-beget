@@ -20,7 +20,7 @@ function install_jpegtran {
     echo_y "Compiling..."
     cd $HOME/.beget/tmp/jpegtran
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ -f "$HOME/.local/bin/jpegtran" ]
     then

@@ -16,7 +16,7 @@ function install_libsmbclient {
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/
     export LIBRARY_PATH=$LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/      
     LD_LIBRARY_PATH=$HOME/.local/usr/lib/x86_64-linux-gnu/ ./configure --with-php-config=/usr/local/php-cgi/5.6/bin/php-config
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install INSTALL_ROOT=$HOME/.local
     printf "\n\n[PHP]\nextension = `find $HOME -name 'smbclient.so'|grep cgi|head -n 1`" >> $HOME/public_html/cgi-bin/php.ini
     printf "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/\nexport LIBRARY_PATH=$LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/" >> $HOME/.profile

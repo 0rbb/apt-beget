@@ -19,7 +19,7 @@ function install_pngquant {
     echo_y "Compiling..."
     cd $HOME/.beget/tmp/pngquant
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ -f "$HOME/.local/bin/pngquant" ]
     then

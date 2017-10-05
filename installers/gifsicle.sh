@@ -36,7 +36,7 @@ function install_gifsicle {
     automake --add-missing
     autoconf
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/gifsicle" ]
     then

@@ -61,7 +61,7 @@ function install_default {
     echo_y "Compilating..."
     cd default
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/default" ]
     then

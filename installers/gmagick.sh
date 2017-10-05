@@ -35,7 +35,7 @@ function install_gmagick {
     cd GraphicsMagick-1.3.25
     export CXXFLAGS="$CXXFLAGS -fPIC"
     ./configure --prefix=$HOME/.local --enable-shared
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     make check
     if [ ! -f "$HOME/.local/bin/gm" ]
@@ -74,7 +74,7 @@ function install_gmagick {
     cd gmagick-1.1.7RC3/
     phpize
     ./configure --prefix=$HOME/.local/lib/php/56/ --with-gmagick=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     cp modules/gmagick.so $HOME/.local/lib/php/56/
     if [ ! -f $HOME/.local/lib/php/56/gmagick.so ]
     then

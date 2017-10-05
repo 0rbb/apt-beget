@@ -34,7 +34,7 @@ function install_unixodbc {
     cd unixODBC-2.3.4
     mkdir $HOME/.local/etc
     ./configure --prefix=$HOME/.local --sysconfdir=$HOME/etc
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/odbc_config" ]
     then

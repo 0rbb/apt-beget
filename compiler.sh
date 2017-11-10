@@ -1,4 +1,7 @@
+#!/usr/bin/env bash
 echo '#!/usr/bin/env bash' > apt-beget.sh
+
+echo '# URL: https://github.com/ford153focus/apt-beget' >> apt-beget.sh
 
 for helper in `find helpers -type f | sort`
 do

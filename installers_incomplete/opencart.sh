@@ -6,8 +6,8 @@ function install_opencart {
     then
         rm -rf public_html
         ln -sf opencart/upload public_html
-        mv $HOME/public_html/config-dist.php $HOME/public_html/config.php
-        mv $HOME/public_html/admin/config-dist.php $HOME/public_html/admin/config.php
+        cp $HOME/public_html/config-dist.php $HOME/public_html/config.php
+        cp $HOME/public_html/admin/config-dist.php $HOME/public_html/admin/config.php
         echo_g "Opencart installed"
     else
         echo_r "Seems like cloning is failed"

@@ -6,13 +6,19 @@ function install_drush {
     echo_y "Installing drush..."
 
     #collecting install information
-    echo_y "Choose the version..."
-    composer show -a "drush/drush" | grep versions
-    read drush_version
-    if [[ ! $drush_version ]]
+    if [[ ! $1 ]]
     then
-        drush_version='dev-master'
+        echo_y "Choose the version..."
+        composer show -a "drush/drush" | grep versions
+        read drush_version
+        if [[ ! $drush_version ]]
+        then
+            drush_version='dev-master'
+        fi
+    else
+        drush_version=$1
     fi
+
 
     #prepare folders
     echo_y "Preparing folders..."

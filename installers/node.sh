@@ -68,7 +68,7 @@ function install_nodejs012 {
 ===https://github.com/nodejs/node/
 =
 function install_nodejs_lts {
-    echo_y "Installing nodejs6..."
+    echo_y "Installing Node.js LTS..."
 
     #prepare folders
     echo_y "Preparing folders..."
@@ -106,7 +106,7 @@ function install_nodejs_lts {
     nodejs_npm
 
     #finish
-    echo_g "Node.JS 6 (LTS) installed"
+    echo_g "Node.JS LTS installed"
 }
 
 function nodejs_npm {

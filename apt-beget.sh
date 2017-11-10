@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# URL: https://github.com/ford153focus/apt-beget
 function apt_localinstall {
     check_d
 
@@ -23,7 +24,7 @@ function apt_localinstall {
     
     echo_y "Setting up..."
     rsync -a $HOME/.beget/tmp/dpkg/usr/ $HOME/.local/
-    echo 'LD_LIBRARY_PATH=~/.local/lib/' >> $HOME/.bashrc
+    echo 'export LD_LIBRARY_PATH=~/.local/lib/:~/.local/lib/x86_64-linux-gnu' >> $HOME/.bashrc
 }
 
 function check_d {
@@ -320,7 +321,7 @@ function install_cwebp {
     cd $HOME/.beget/tmp/libwebp
     ./autogen.sh
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/cwebp" ]
     then
@@ -347,11 +348,14 @@ function install_django {
     echo_y "Satisfaying depencies..."
     install_python3
 
-#install
+    #install
     echo_y "Installing..."
     pip3 install django --user --ignore-installed
+
     echo_y "Creating project..."
-    python3 $HOME/.local/bin/django-admin.py startproject .
+    cd $HOME
+    $HOME/.local/bin/python3 $HOME/.local/bin/django-admin.py startproject HelloDjango --verbosity 3
+
     echo_y "Setting up..."
     echo "# -*- coding: utf-8 -*-
 import os, sys
@@ -418,27 +422,86 @@ function install_drupal_7 {
     check_s
     echo_y "Installing Drupal 7..."
 
+    #collecting install information
+    echo_y 'ENTER admin account mail (default is "admin@example.com")'
+    read account_mail
+    if [[ ! $account_mail ]]
+    then
+        account_mail=`whoami`
+    fi
+
+    echo_y 'ENTER admin account name (default is current account login)'
+    read account_name
+    if [[ ! $account_name ]]
+    then
+        account_name=`whoami`
+    fi
+
+    echo_y 'ENTER account pass (default is "fordfocus")'
+    read account_pass
+    if [[ ! $account_pass ]]
+    then
+        account_pass='fordfocus'
+    fi
+
+    echo_y 'ENTER database name (default is "root")'
+    read db_name
+    if [[ ! $db_name ]]
+    then
+        db_name=`whoami`
+    fi
+
+    echo_y 'ENTER database pass (default is "fordfocus")'
+    read db_pass
+    if [[ ! $db_pass ]]
+    then
+        db_pass='fordfocus'
+    fi
+
+    echo_y 'ENTER site mail (for outgoing mail) (default is "admin@example.com")'
+    read site_mail
+    if [[ ! $site_mail ]]
+    then
+        site_mail='admin@example.com'
+    fi
+
+    echo_y 'ENTER site name (default is "My site")'
+    read site_name
+    if [[ ! $site_name ]]
+    then
+        site_name='My site'
+    fi
+
     #prepare folders
     echo_y "Preparing folders..."
     prepare_folders
 
     #depencies
     echo_y "Satisfaying depencies..."
-    install_drush_7
-    PATH=$PATH:/usr/local/php-cgi/5.6/bin
+    install_drush 7.x-dev
 
     #install
+    PATH=$PATH:/usr/local/php-cgi/5.6/bin
+    PATH=$PATH:~/.composer/vendor/bin/
+
     echo_y "Installing..."
-    cd ~
+    cd $HOME
     folder_name=${PWD##*/}
+
     echo_y "Creating project..."
-    drush dl drupal --drupal-project-rename='public_html'
+    rm -rf ~/public_html/
+    drush dl drupal-7.x --drupal-project-rename='public_html'
+
     echo_y "Setting up..."
     cd public_html
-    #drush site-install standard --locale=ru --db-url='sqlite://../db.sqlite' --site-name="$folder_name" --account-name=`whoami` --account-pass=fordfocus
+    #drush site-install standard --locale=ru --db-url='sqlite://../db.sqlite' --site-name="$site_name" --account-name=`whoami` --account-pass=fordfocus
+    drush site-install standard \
+        --account-mail="$account_mail" --account-name="$account_name" --account-pass="$account_pass" \
+        --db-url="mysql://$db_name:$db_pass@localhost/$db_name" --locale=ru-RU \
+        --site-mail="$site_mail" --site-name="$site_name"
 
     #finish
-    echo_g "Drupal 8 installed"
+    echo_g "Drupal 7 installed"
 }
 
 :<<=
@@ -455,8 +518,8 @@ function install_drupal_8 {
 
     #depencies
     echo_y "Satisfaying depencies..."
-    install_drush_8
-    PATH=$PATH:/usr/local/php-cgi/5.6/bin
+    install_drush 8.x-dev
+    PATH=$PATH:/usr/local/php-cgi/7.1/bin
 
     #install
     echo_y "Installing..."
@@ -481,13 +544,19 @@ function install_drush {
     echo_y "Installing drush..."
 
     #collecting install information
-    echo_y "Choose the version..."
-    composer show -a "drush/drush" | grep versions
-    read drush_version
-    if [[ ! $drush_version ]]
+    if [[ ! $1 ]]
     then
-        drush_version='dev-master'
+        echo_y "Choose the version..."
+        composer show -a "drush/drush" | grep versions
+        read drush_version
+        if [[ ! $drush_version ]]
+        then
+            drush_version='dev-master'
+        fi
+    else
+        drush_version=$1
     fi
+
 
     #prepare folders
     echo_y "Preparing folders..."
@@ -720,7 +789,7 @@ function install_gifsicle {
     automake --add-missing
     autoconf
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/gifsicle" ]
     then
@@ -811,7 +880,7 @@ function install_gmagick {
     cd GraphicsMagick-1.3.25
     export CXXFLAGS="$CXXFLAGS -fPIC"
     ./configure --prefix=$HOME/.local --enable-shared
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     make check
     if [ ! -f "$HOME/.local/bin/gm" ]
@@ -850,7 +919,7 @@ function install_gmagick {
     cd gmagick-1.1.7RC3/
     phpize
     ./configure --prefix=$HOME/.local/lib/php/56/ --with-gmagick=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     cp modules/gmagick.so $HOME/.local/lib/php/56/
     if [ ! -f $HOME/.local/lib/php/56/gmagick.so ]
     then
@@ -899,7 +968,7 @@ function install_htop {
     cd $HOME/.beget/tmp/htop
     ./autogen.sh
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ -f "$HOME/.local/bin/htop" ]
     then
@@ -962,7 +1031,7 @@ function install_jpegoptim {
     echo_y "Compilating..."
     cd jpegoptim
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make strip
     make install
     if [ ! -f "$HOME/.local/bin/jpegoptim" ]
@@ -998,7 +1067,7 @@ function install_jpegtran {
     echo_y "Compiling..."
     cd $HOME/.beget/tmp/jpegtran
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ -f "$HOME/.local/bin/jpegtran" ]
     then
@@ -1066,7 +1135,7 @@ function install_libsmbclient {
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/
     export LIBRARY_PATH=$LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/      
     LD_LIBRARY_PATH=$HOME/.local/usr/lib/x86_64-linux-gnu/ ./configure --with-php-config=/usr/local/php-cgi/5.6/bin/php-config
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install INSTALL_ROOT=$HOME/.local
     printf "\n\n[PHP]\nextension = `find $HOME -name 'smbclient.so'|grep cgi|head -n 1`" >> $HOME/public_html/cgi-bin/php.ini
     printf "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/\nexport LIBRARY_PATH=$LIBRARY_PATH:$HOME/.local/usr/lib/x86_64-linux-gnu/" >> $HOME/.profile
@@ -1220,7 +1289,7 @@ function install_ncdu {
     autoheader
     automake --add-missing
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/ncdu" ]
     then
@@ -1323,7 +1392,7 @@ function install_nodejs012 {
     echo_y "Compilating..."
     cd $HOME/.beget/tmp/node-v0.12.7
     ./configure --dest-os=linux --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/node" ]
     then
@@ -1345,7 +1414,7 @@ function install_nodejs012 {
 ===https://github.com/nodejs/node/
 =
 function install_nodejs_lts {
-    echo_y "Installing nodejs6..."
+    echo_y "Installing Node.js LTS..."
 
     #prepare folders
     echo_y "Preparing folders..."
@@ -1383,7 +1452,7 @@ function install_nodejs_lts {
     nodejs_npm
 
     #finish
-    echo_g "Node.JS 6 (LTS) installed"
+    echo_g "Node.JS LTS installed"
 }
 
 function nodejs_npm {
@@ -1593,7 +1662,7 @@ function install_optipng {
     echo_y "Compiling..."
     cd $HOME/.beget/tmp/optipng-0.7.6/
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
 
     echo_g "optipng installed"
@@ -1664,7 +1733,7 @@ function install_phalcon {
     #compilation
     echo_y "Compilating..."
     cd $HOME/.beget/tmp/cphalcon/build
-    PATH=$PATH:/usr/local/php-cgi/7.1/bin/
+    PATH=$PATH:/usr/local/php-cgi/$var/bin/
     ./install
     if [ ! -f "$HOME/.beget/tmp/cphalcon/build/php7/64bits/modules/phalcon.so" ]
     then
@@ -1844,7 +1913,7 @@ function install_pngquant {
     echo_y "Compiling..."
     cd $HOME/.beget/tmp/pngquant
     ./configure --prefix=$HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ -f "$HOME/.local/bin/pngquant" ]
     then
@@ -1911,8 +1980,8 @@ function install_python3 {
 
     #Download
     echo_y 'Downloading...'
-    curl -Lk https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz > $HOME/.beget/tmp/Python-3.6.2.tgz
-    if [ ! -f "$HOME/.beget/tmp/Python-3.6.2.tgz" ]
+    curl -Lk https://www.python.org/ftp/python/3.6.3/Python-3.6.3.tgz > $HOME/.beget/tmp/Python-3.6.3.tgz
+    if [ ! -f "$HOME/.beget/tmp/Python-3.6.3.tgz" ]
     then
         echo_r 'download is failed'
         exit 1
@@ -1921,8 +1990,8 @@ function install_python3 {
     #Unpacking
     cd $HOME/.beget/tmp
     echo_y 'Unpacking...'
-    tar xvf Python-3.6.2.tgz
-    if [ ! -d "$HOME/.beget/tmp/Python-3.6.2" ]
+    tar xvf Python-3.6.3.tgz
+    if [ ! -d "$HOME/.beget/tmp/Python-3.6.3" ]
     then
         echo_r "Seems like unpacking is failed"
         exit 1
@@ -1930,9 +1999,9 @@ function install_python3 {
 
     #Compiling
     echo_y "Compiling..."
-    cd Python-3.6.2
+    cd Python-3.6.3
     ./configure --prefix $HOME/.local
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/pip3" ]
     then
@@ -1950,13 +2019,17 @@ function install_python3 {
 :<<=
 ==Ruby On Rails
 =
-function install_default {
+function install_ror {
     check_ds
     echo_y "Installing Ruby On Rails..."
 
     #prepare folders
     echo_y "Preparing folders..."
     prepare_folders
+
+    #depencies
+    echo_y "Satisfaying depencies..."
+    install_nodejs
 
     #install
     echo_y "Installing..."
@@ -1968,9 +2041,8 @@ function install_default {
     rails new .
     ln -sf public public_html
     echo "gem 'rb-readline'
-    gem 'execjs'
-    gem 'therubyracer'
-    gem 'sqlite3'" >> $HOME/Gemfile
+gem 'execjs'
+gem 'therubyracer'" >> $HOME/Gemfile
     bundle install
 
     echo_y "Setting up..."
@@ -1984,6 +2056,12 @@ ENV['GEM_PATH'] = '$HOME/.gem/ruby/2.3.1/'
 require 'bundler/setup'" >> $HOME/config/setup_load_paths.rb
     mkdir $HOME/tmp
     touch $HOME/tmp/restart.txt
+
+    main_acc=$(ruby -e 'print `whoami`.gsub(/__[a-z0-9_]+$/, "")')
+    echo "ssh $main_acc@localhost -p 222 /opt/rubies/2.3/bin/ruby \$@" > ~/.local/bin/ruby
+    chmod +x ~/.local/bin/ruby
+    ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
+    ssh-copy-id -i ~/.ssh/id_rsa.pub "$main_acc@localhost -p 222"
 
     #finish
     echo_g "Ruby On Rails installed"
@@ -2026,7 +2104,7 @@ function install_unixodbc {
     cd unixODBC-2.3.4
     mkdir $HOME/.local/etc
     ./configure --prefix=$HOME/.local --sysconfdir=$HOME/etc
-    make -j $(expr $(nproc) / 4)
+    make -j $(expr $(nproc) / 21)
     make install
     if [ ! -f "$HOME/.local/bin/odbc_config" ]
     then

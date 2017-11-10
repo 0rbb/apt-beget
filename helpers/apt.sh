@@ -22,5 +22,5 @@ function apt_localinstall {
     
     echo_y "Setting up..."
     rsync -a $HOME/.beget/tmp/dpkg/usr/ $HOME/.local/
-    echo 'LD_LIBRARY_PATH=~/.local/lib/' >> $HOME/.bashrc
+    echo 'export LD_LIBRARY_PATH=~/.local/lib/:~/.local/lib/x86_64-linux-gnu' >> $HOME/.bashrc
 }

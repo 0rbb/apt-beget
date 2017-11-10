@@ -34,7 +34,7 @@ function install_phalcon {
     #compilation
     echo_y "Compilating..."
     cd $HOME/.beget/tmp/cphalcon/build
-    PATH=$PATH:/usr/local/php-cgi/7.1/bin/
+    PATH=$PATH:/usr/local/php-cgi/$var/bin/
     ./install
     if [ ! -f "$HOME/.beget/tmp/cphalcon/build/php7/64bits/modules/phalcon.so" ]
     then

@@ -18,16 +18,19 @@ function install_laravel {
     echo_y "Installing..."
     cd ~
     rm -rf ~/public_html
+    mkdir -p ~/.local/bin
+    mkdir -p ~/.local/etc
 
     echo "/usr/local/php-cgi/7.1/bin/php -c $HOME/.local/etc/php.ini \$@" > $HOME/.local/bin/php
     chmod +x $HOME/.local/bin/php
-
+    PATH=~/.local/bin/:~/.composer/vendor/bin/:$PATH
 #    composer create-project --prefer-dist laravel/laravel public_html
     composer global require "laravel/installer"
-    PATH=$PATH:~/.composer/vendor/bin/
+    
     laravel new . --force
     ln -s public public_html
     cp .env.example .env
+    chmod +x ~/artisan
     ./artisan key:generate
     ./artisan config:clear
 

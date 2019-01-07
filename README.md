@@ -1,4 +1,1 @@
- - 10*.sh - helpers
- - 20*.sh - installers
- - 30launcher.sh - cli argument parser and installer launcher
- - compiler.sh - assembling helpers, installers and launcher to one-file download ready installer
+Install stuff on shared-hosting

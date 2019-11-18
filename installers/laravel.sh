@@ -9,11 +9,6 @@ function install_laravel {
     echo_y "Preparing folders..."
     prepare_folders
 
-    #depencies
-    echo_y "Satisfaying depencies..."
-    install_composer
-#    install_nodejs
-
     #install
     echo_y "Installing..."
     cd ~
@@ -21,15 +16,15 @@ function install_laravel {
     mkdir -p ~/.local/bin
     mkdir -p ~/.local/etc
 
-    echo "/usr/local/php-cgi/7.1/bin/php -c $HOME/.local/etc/php.ini \$@" > $HOME/.local/bin/php
-    chmod +x $HOME/.local/bin/php
-    PATH=~/.local/bin/:~/.composer/vendor/bin/:$PATH
-#    composer create-project --prefer-dist laravel/laravel public_html
-    composer global require "laravel/installer"
+    echo "/usr/local/php-cgi/7.2/bin/php \$@" > $HOME/.local/bin/php
+    echo "/usr/local/bin/composer-php7.2 \$@" > $HOME/.local/bin/composer
+    chmod +x $HOME/.local/bin/*
     
-    laravel new . --force
+    composer create-project --prefer-dist laravel/laravel ~/tmp
+    shopt -s dotglob
+    mv ~/tmp/* .
+    
     ln -s public public_html
-    cp .env.example .env
     chmod +x ~/artisan
     ./artisan key:generate
     ./artisan config:clear
